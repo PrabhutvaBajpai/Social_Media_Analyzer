@@ -1,0 +1,12 @@
+{
+  "name": "social-media-analyzer-root",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "npm install --prefix backend && npm install --prefix front && npm run build --prefix front",
+    "start": "npm run start --prefix backend",
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix front\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
