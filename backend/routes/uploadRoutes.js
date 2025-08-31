@@ -1,18 +1,14 @@
+// backend/routes/uploadRoutes.js
 const express = require("express");
-const cors = require("cors");
 const multer = require("multer");
 const { extractText } = require("../controllers/extractController");
-const serverless = require("serverless-http");
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+const router = express.Router();
 
-// ✅ Use memory storage instead of writing to disk
-const storage = multer.memoryStorage();
-const upload = multer({ storage });
+// Multer setup for file upload
+const upload = multer({ dest: "uploads/" });
 
-app.post("/", upload.single("file"), extractText);
+// Single file upload endpoint
+router.post("/", upload.single("file"), extractText);
 
-module.exports = serverless(app);
+module.exports = router;

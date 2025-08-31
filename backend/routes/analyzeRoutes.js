@@ -1,14 +1,10 @@
 const express = require("express");
-const cors = require("cors");
+const router = express.Router();
 const Sentiment = require("sentiment");
-const serverless = require("serverless-http");
-
-const app = express();
-app.use(cors());
-app.use(express.json());
 
 const sentiment = new Sentiment();
 
+// Categories (you can expand later)
 const categories = {
   sports: ["football", "cricket", "basketball", "tennis"],
   technology: ["ai", "machine", "computer", "software", "tech"],
@@ -24,6 +20,7 @@ function detectCategory(text) {
   return "general";
 }
 
+// ✅ Updated Toxicity (High / Medium / Low)
 function detectToxicity(text) {
   const toxicWords = ["stupid", "hate", "idiot", "kill", "dumb"];
   const lower = text.toLowerCase();
@@ -38,17 +35,26 @@ function detectToxicity(text) {
   return "Low";
 }
 
-app.post("/", (req, res) => {
+// POST /api/analyze
+router.post("/", (req, res) => {
   const { text } = req.body;
   if (!text) {
     return res.status(400).send({ error: "Text required" });
   }
 
+  // Sentiment
   const sent = sentiment.analyze(text);
+
+  // Category
   const category = detectCategory(text);
+
+  // Toxicity
   const toxicity = detectToxicity(text);
+
+  // Suggestions (hashtags)
   const suggestions = [`#${category}`, "#trending", "#social"];
 
+  // ✅ Send response
   res.send({
     sentiment:
       sent.score > 0 ? "Positive" : sent.score < 0 ? "Negative" : "Neutral",
@@ -59,4 +65,4 @@ app.post("/", (req, res) => {
   });
 });
 
-module.exports = serverless(app);
+module.exports = router;
