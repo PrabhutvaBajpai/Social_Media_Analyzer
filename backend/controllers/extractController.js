@@ -1,30 +1,27 @@
-const pdfParser = require("../utils/pdfParser");
-const ocrParser = require("../utils/ocrParser");
-const path = require("path");
-const fs = require("fs");
+const pdfParse = require("pdf-parse");
+const Tesseract = require("tesseract.js");
 
 exports.extractText = async (req, res) => {
   try {
-    if (!req.file) {
+    if (!req.file || !req.file.buffer) {
       return res.status(400).json({ error: "No file uploaded" });
     }
 
-    const filePath = path.join(__dirname, "..", req.file.path);
+    const buffer = req.file.buffer;
     let extractedText = "";
 
     // PDF parsing
     if (req.file.mimetype === "application/pdf") {
-      extractedText = await pdfParser(filePath);
+      const data = await pdfParse(buffer);
+      extractedText = data.text;
     }
     // Image OCR parsing
     else if (req.file.mimetype.startsWith("image/")) {
-      extractedText = await ocrParser(filePath);
+      const result = await Tesseract.recognize(buffer, "eng");
+      extractedText = result.data.text;
     } else {
       extractedText = "Unsupported file type";
     }
-
-    // Cleanup temp file
-    fs.unlinkSync(filePath);
 
     res.json({ extractedText });
   } catch (err) {

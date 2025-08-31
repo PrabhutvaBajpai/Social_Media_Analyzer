@@ -1,10 +1,7 @@
-// backend/utils/pdfParser.js
-const fs = require("fs");
 const pdfParse = require("pdf-parse");
 
-const pdfParser = async (filePath) => {
-  const dataBuffer = fs.readFileSync(filePath);
-  const data = await pdfParse(dataBuffer);
+const pdfParser = async (buffer) => {
+  const data = await pdfParse(buffer);
   return data.text;
 };
 
